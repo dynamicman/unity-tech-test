@@ -11,8 +11,15 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _speed = 10.0f;
 
+    private bool WALKING = false;
+    public Transform Shoulder_Left, Shoulder_Right;
+
     void Update()
     {
+        if ( WALKING ) {
+            DoSwingArms( );
+        }
+
         // Check Input
         if (Input.GetMouseButtonUp(0))
         {
@@ -30,15 +37,27 @@ public class Player : MonoBehaviour
             var currentNode = _currentPath[_currentPathIndex];
             
             var maxDistance = _speed * Time.deltaTime;
-            var vectorToDestination = currentNode.Position - transform.position;
+            var vectorToDestination = currentNode._position - transform.position;
             var moveDistance = Mathf.Min(vectorToDestination.magnitude, maxDistance);
 
             var moveVector = vectorToDestination.normalized * moveDistance;
             moveVector.y = 0f; // Ignore Y
             transform.position += moveVector;
+            transform.forward = moveVector;
 
-            if (transform.position == currentNode.Position)
+            if (transform.position == currentNode._position)
                 _currentPathIndex++;
+
+            WALKING = true;
+        } else {
+            WALKING = false;
         }
+    }
+
+    private void DoSwingArms ( )
+    {
+        float sin = Mathf.Sin(Time.time * 10.0f);
+        Shoulder_Left.localEulerAngles = new Vector3( sin * 30, 0, 0 );
+        Shoulder_Right.localEulerAngles = new Vector3( sin * -30, 0, 0 );
     }
 }

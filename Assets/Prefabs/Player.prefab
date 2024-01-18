@@ -542,6 +542,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _grid: {fileID: 0}
   _speed: 10
+  Shoulder_Left: {fileID: 1722366271950988449}
+  Shoulder_Right: {fileID: 4696872953566651448}
 --- !u!33 &8618333106129401312
 MeshFilter:
   m_ObjectHideFlags: 0
