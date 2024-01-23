@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pathfinding 
+public class Pathfinding
 {
     private List<NavGridPathNode> openList;
     private List<NavGridPathNode> closedList;
@@ -25,7 +25,7 @@ public class Pathfinding
 
             if ( current == end ) {
                 Debug.LogError( "REACHED THE END!" );
-                return CalculatePath( end );
+                return SimpleSmooth( CalculatePath( end ) );
             }
 
             // Not the end yet!
@@ -41,7 +41,7 @@ public class Pathfinding
                     continue;
                 }
 
-                int tentativeGCost = current.gCost + 
+                int tentativeGCost = current.gCost +
                                      NavGrid.m.CalculateDistanceCost( current.x, current.z, neighbor.x, neighbor.z );
                 if ( tentativeGCost < neighbor.gCost ) {
                     neighbor._previousNode = current;
@@ -49,7 +49,7 @@ public class Pathfinding
                     neighbor.hCost = NavGrid.m.CalculateDistanceCost( neighbor.x, neighbor.z, end.x, end.z );
                     neighbor.CalculateFCost( );
 
-                    if ( !openList.Contains(neighbor ) ) {
+                    if ( !openList.Contains( neighbor ) ) {
                         openList.Add( neighbor );
                     }
                 }
@@ -67,12 +67,26 @@ public class Pathfinding
         List <NavGridPathNode> calculatedPath = new List<NavGridPathNode>();
         calculatedPath.Add( end );
         NavGridPathNode current = end;
-        while (current._previousNode != null ) {
+        while ( current._previousNode != null ) {
             current = current._previousNode;
             calculatedPath.Add( current );
         }
         calculatedPath.Reverse( );
         return calculatedPath;
+    }
+
+    public List<NavGridPathNode> SimpleSmooth ( List<NavGridPathNode> path )
+    {
+        int k = 0;
+        List <NavGridPathNode> smoothedPath = new List<NavGridPathNode>( );
+        smoothedPath.Add( path[ 0 ] );
+        for ( int i = 1; i < path.Count - 1; i++ ) {
+            if ( NavGrid.m.LineOfSight( smoothedPath[ k ], path[ i + 1 ] ) ) { continue; }
+            smoothedPath.Add( path[ i ] );
+            k++;
+        }
+        smoothedPath.Add( path[ path.Count - 1 ] );
+        return smoothedPath;
     }
 
 
