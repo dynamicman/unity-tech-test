@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     private bool WALKING = false;
     public Transform Shoulder_Left, Shoulder_Right;
 
+    public GameObject Confetti;
+    private GameObject ActiveConfetti;
+
     void Update()
     {
         if ( WALKING ) {
@@ -50,6 +53,10 @@ public class Player : MonoBehaviour
 
             WALKING = true;
         } else {
+            if ( WALKING ) {
+                if ( ActiveConfetti  != null ) { Destroy( ActiveConfetti ); }
+                ActiveConfetti = Instantiate( Confetti, transform.position, Quaternion.identity );
+            }
             WALKING = false;
         }
     }
