@@ -78,7 +78,7 @@ public class NavGrid : MonoBehaviour
             if ( here.z + 1 < DETAIL ) neighbors.Add( GetNode( here.x - 1, here.z + 1 ) );
         }
 
-        if ( here.x - 1 >= 0 ) {
+        if ( here.x + 1 < DETAIL ) {
             // Right
             neighbors.Add( GetNode( here.x + 1, here.z ) );
             // Right Down
@@ -171,6 +171,11 @@ public class NavGrid : MonoBehaviour
         }
     }
 
+    public bool LineOfSight ( NavGridPathNode a, NavGridPathNode b )
+    {
+        return LineOfSight( a.x, a.z, b.x, b.z );
+    }
+
     public bool LineOfSight ( int a_x, int a_z, int b_x, int b_z )
     {
         int x0 = a_x;
@@ -232,6 +237,9 @@ public class NavGrid : MonoBehaviour
 
     public bool isTraversable ( int x, int z )
     {
+        if ( x < 0 || z < 0 ) { return false; }
+        if ( x >= DETAIL || z >= DETAIL ) { return false; }
+
         return _nodes[ x, z ]._traversable;
     }
 
