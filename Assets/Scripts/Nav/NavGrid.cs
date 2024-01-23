@@ -34,8 +34,8 @@ public class NavGrid : MonoBehaviour
         // Convert x,z position to node value
         int x = Mathf.FloorToInt( (position.x - start_x ) / detail_x );
         int z = Mathf.FloorToInt( (position.z - start_z ) / detail_z );
-        Debug.Log( " click from [" + position.x + "," + position.z + "]" );
-        Debug.Log( " click to [" + x + "," + z + "]" );
+        //Debug.Log( " click from [" + position.x + "," + position.z + "]" );
+        //Debug.Log( " click to [" + x + "," + z + "]" );
 
         if ( _nodes[ x, z ]._traversable ) {
             lastClickedNode = _nodes[ x, z ];
@@ -152,12 +152,12 @@ public class NavGrid : MonoBehaviour
     /// </summary>
     public NavGridPathNode[ ] GetPath ( Vector3 origin, Vector3 destination )
     {
-        Debug.Log( " will pathfind " + ( _pathfinding == null ) );
+        //Debug.Log( " will pathfind " + ( _pathfinding == null ) );
         NavGridPathNode originNode = FindNearestNode( origin );
         NavGridPathNode destinationNode = FindNearestNode( destination );
         RecentPath = _pathfinding.FindPathASTAR( originNode, destinationNode );
 
-        Debug.LogError( "LineOfSight " + LineOfSight( originNode.x, originNode.z, destinationNode.x, destinationNode.z ) );
+        //Debug.LogError( "LineOfSight " + LineOfSight( originNode.x, originNode.z, destinationNode.x, destinationNode.z ) );
         if ( RecentPath != null ) {
 
             return RecentPath.ToArray( );

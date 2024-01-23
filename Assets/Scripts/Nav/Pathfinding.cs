@@ -8,7 +8,7 @@ public class Pathfinding
     private List<NavGridPathNode> closedList;
     public List<NavGridPathNode> FindPathASTAR ( NavGridPathNode start, NavGridPathNode end )
     {
-        Debug.Log( " will pathfind2" );
+        //Debug.Log( " will pathfind2" );
         openList = new List<NavGridPathNode> { start };
         closedList = new List<NavGridPathNode>( );
 
@@ -17,14 +17,14 @@ public class Pathfinding
         start.hCost = NavGrid.m.CalculateDistanceCost( start.x, start.z, end.x, end.z );
         start.CalculateFCost( );
 
-        Debug.Log( " will pathfind3" );
+        //Debug.Log( " will pathfind3" );
         while ( openList.Count > 0 ) {
-            Debug.Log( " will pathfind + " + openList.Count );
+            //Debug.Log( " will pathfind + " + openList.Count );
             NavGridPathNode current = NavGrid.m.GetLowestFCostNode( openList );
-            Debug.Log( " will pathfind + [" + current.x + "," + current.z + "]" );
+            //Debug.Log( " will pathfind + [" + current.x + "," + current.z + "]" );
 
             if ( current == end ) {
-                Debug.LogError( "REACHED THE END!" );
+                //Debug.LogError( "REACHED THE END!" );
                 return SimpleSmooth( CalculatePath( end ) );
             }
 
@@ -32,7 +32,7 @@ public class Pathfinding
             openList.Remove( current );
             closedList.Add( current );
             List<NavGridPathNode> neighbors = NavGrid.m.GetNeighborList( current );
-            Debug.Log( " found " + neighbors.Count + " neighbors" );
+            //Debug.Log( " found " + neighbors.Count + " neighbors" );
             foreach ( NavGridPathNode neighbor in neighbors ) {
                 // Is the neighbor already on the list?
                 if ( closedList.Contains( neighbor ) ) continue;
