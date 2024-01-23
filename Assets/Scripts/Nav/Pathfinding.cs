@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class Pathfinding 
 {
-    
-
     private List<NavGridPathNode> openList;
     private List<NavGridPathNode> closedList;
-    public List<NavGridPathNode> FindPath ( NavGridPathNode start, NavGridPathNode end )
+    public List<NavGridPathNode> FindPathASTAR ( NavGridPathNode start, NavGridPathNode end )
     {
         Debug.Log( " will pathfind2" );
         openList = new List<NavGridPathNode> { start };

@@ -155,9 +155,11 @@ public class NavGrid : MonoBehaviour
         Debug.Log( " will pathfind " + ( _pathfinding == null ) );
         NavGridPathNode originNode = FindNearestNode( origin );
         NavGridPathNode destinationNode = FindNearestNode( destination );
-        RecentPath = _pathfinding.FindPath( originNode, destinationNode );
+        RecentPath = _pathfinding.FindPathASTAR( originNode, destinationNode );
 
+        Debug.LogError( "LineOfSight " + LineOfSight( originNode.x, originNode.z, destinationNode.x, destinationNode.z ) );
         if ( RecentPath != null ) {
+
             return RecentPath.ToArray( );
         } else {
             Debug.LogError( "Failed to get a path!" );
@@ -166,7 +168,71 @@ public class NavGrid : MonoBehaviour
                 new() { _position = origin },
                 new() { _position = destination }
             };
-        } 
+        }
+    }
+
+    public bool LineOfSight ( int a_x, int a_z, int b_x, int b_z )
+    {
+        int x0 = a_x;
+        int z0 = a_z;
+
+        int x1 = b_x;
+        int z1 = b_z;
+
+        int dx = x1 - x0;
+        int dz = z1 - z0;
+
+
+        int f = 0;
+
+        // Set the x increment
+        int incr_x = 1;
+        if ( dx < 0 ) {
+            dx = -dx;
+            incr_x = -1;
+        }
+
+        // Set the z increment
+        int incr_z = 1;
+        if ( dz < 0 ) {
+            dz = -dz;
+            incr_z = -1;
+        }
+
+        if ( dx >= dz ) {
+
+            while ( x0 != x1 ) {
+                f = f + dz;
+                if ( f >= dx ) {
+                    if ( !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 + ( ( incr_z - 1 ) / 2 ) ) ) { return false; }
+                    z0 = z0 + incr_z;
+                    f = f - dx;
+                }
+                if ( f != 0 && !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 + ( ( incr_z - 1 ) / 2 ) ) ) { return false; }
+                if ( dz == 0 && !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 ) && !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 - 1 ) ) { return false; }
+
+                x0 = x0 + a_x;
+            }
+
+        } else {
+            while ( z0 != z1 ) {
+                f = f + dx;
+                if ( f >= dz ) {
+                    if ( !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 + ( ( incr_z - 1 ) / 2 ) ) ) { return false; }
+                    x0 = x0 + incr_x;
+                    f = f - dz;
+                }
+                if ( f != 0 && !isTraversable( x0 + ( ( incr_x - 1 ) / 2 ), z0 + ( ( incr_z - 1 ) / 2 ) ) ) { return false; }
+                if ( dx == 0 && !isTraversable( x0, z0 + ( ( incr_z - 1 ) / 2 ) ) && !isTraversable( z0 - 1, z0 + ( ( incr_z - 1 ) / 2 ) ) ) { return false; }
+                z0 = z0 + incr_z;
+            }
+        }
+        return true;
+    }
+
+    public bool isTraversable ( int x, int z )
+    {
+        return _nodes[ x, z ]._traversable;
     }
 
     // Draw the traversable area in teal
