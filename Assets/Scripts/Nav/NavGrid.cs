@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-
+// Stores the grid of nodes and handle related helper functions
 public class NavGrid : MonoBehaviour
 {
     public static NavGrid m;
@@ -11,6 +11,8 @@ public class NavGrid : MonoBehaviour
     public const int DETAIL = 100;
     private const int MOVE_STRAIGHT_COST = 10;
     private const int MOVE_DIAGONAL_COST = 14;
+
+    public NavGridPathNode lastClickedNode;
 
     public Pathfinding _pathfinding;
 
@@ -21,6 +23,7 @@ public class NavGrid : MonoBehaviour
         _pathfinding = new Pathfinding( );
     }
 
+    // Find the node on the grid closest to the given position
     public NavGridPathNode FindNearestNode ( Vector3 position )
     {
         int width = 50;
@@ -45,14 +48,17 @@ public class NavGrid : MonoBehaviour
         return lastClickedNode;
     }
 
-    public NavGridPathNode lastClickedNode;
-
+    // Get the node at the given position
     public NavGridPathNode GetNode ( int x, int z )
     {
-        //TODO: Add checks
+        // Check if the array indicies are valid
+        if ( x < 0 || z < 0 ) { return null; }
+        if ( x >= DETAIL || z >= DETAIL ) { return null; }
+
         return _nodes[ x, z ];
     }
 
+    // Setup the nodes before pathfinding
     public void InitNodes ( )
     {
         NavGridPathNode node;
@@ -66,34 +72,65 @@ public class NavGrid : MonoBehaviour
         }
     }
 
+    // Find and add all neighbors to a list for consideration
     public List<NavGridPathNode> GetNeighborList ( NavGridPathNode here )
     {
         List<NavGridPathNode> neighbors = new List<NavGridPathNode>();
+        NavGridPathNode temp = null;
         if ( here.x - 1 >= 0 ) {
             // Left
-            neighbors.Add( GetNode( here.x - 1, here.z ) );
+            temp = GetNode( here.x - 1, here.z );
+            if ( temp != null ) {
+                neighbors.Add( temp );
+            }
             // Left Down
-            if ( here.z - 1 >= 0 ) neighbors.Add( GetNode( here.x - 1, here.z - 1 ) );
+            if ( here.z - 1 >= 0 ) {
+                temp = GetNode( here.x - 1, here.z - 1 );
+                if ( temp != null ) { neighbors.Add( temp ); }
+            }
             // Left Up
-            if ( here.z + 1 < DETAIL ) neighbors.Add( GetNode( here.x - 1, here.z + 1 ) );
+            if ( here.z + 1 < DETAIL ) {
+                temp = GetNode( here.x - 1, here.z + 1 );
+                if ( temp != null ) { neighbors.Add( temp ); }
+            }
         }
 
         if ( here.x + 1 < DETAIL ) {
             // Right
-            neighbors.Add( GetNode( here.x + 1, here.z ) );
+            temp = GetNode( here.x + 1, here.z );
+            if ( temp != null ) {
+                neighbors.Add( temp );
+            }
             // Right Down
-            if ( here.z - 1 >= 0 ) neighbors.Add( GetNode( here.x + 1, here.z - 1 ) );
+            if ( here.z - 1 >= 0 ) {
+                temp = GetNode( here.x + 1, here.z - 1 );
+                if ( temp != null ) { neighbors.Add( temp ); }
+            }
             // Right Up
-            if ( here.z + 1 < DETAIL ) neighbors.Add( GetNode( here.x + 1, here.z + 1 ) );
+            if ( here.z + 1 < DETAIL ) {
+                temp = GetNode( here.x + 1, here.z + 1 );
+                if ( temp != null ) { neighbors.Add( temp ); }
+            }
         }
         // Down
-        if ( here.z - 1 >= 0 ) neighbors.Add( GetNode( here.x, here.z - 1 ) );
+        if ( here.z - 1 >= 0 ) {
+            temp = GetNode( here.x, here.z - 1 );
+            if ( temp != null ) { neighbors.Add( temp ); }
+        }
         // Up
-        if ( here.z + 1 < DETAIL ) neighbors.Add( GetNode( here.x, here.z + 1 ) );
+        if ( here.z + 1 < DETAIL ) {
+            temp = GetNode( here.x, here.z + 1 );
+            if ( temp != null ) { neighbors.Add( temp ); }
+        }
 
         return neighbors;
     }
 
+    // Calculate the distance between two node points
+    public int CalculateDistanceCost ( NavGridPathNode a, NavGridPathNode b )
+    {
+        return CalculateDistanceCost( a.x, a.z, b.x, b.z );
+    }
     public int CalculateDistanceCost ( int a_x, int a_z, int b_x, int b_z )
     {
         int xDistance = Mathf.Abs( a_x - b_x );
@@ -103,6 +140,7 @@ public class NavGrid : MonoBehaviour
                MOVE_STRAIGHT_COST * remaining;
     }
 
+    // Find the lowest F cost node within a list
     public NavGridPathNode GetLowestFCostNode ( List<NavGridPathNode> nodeList )
     {
         NavGridPathNode lowestFCostNode = nodeList[ 0 ];
@@ -136,7 +174,7 @@ public class NavGrid : MonoBehaviour
                 _nodes[ x, z ] = new NavGridPathNode( );
                 Vector3 position = new Vector3( x * detail_x + start_x, testHeightHalf, z * detail_z + start_z );
 
-                Debug.Log( "Placing [" + x + "," + z + "] at [" + position.x + "," + position.z + "]" );
+                //Debug.Log( "Placing [" + x + "," + z + "] at [" + position.x + "," + position.z + "]" );
                 _nodes[ x, z ]._position = position;
                 _nodes[ x, z ].x = x;
                 _nodes[ x, z ].z = z;
@@ -154,7 +192,9 @@ public class NavGrid : MonoBehaviour
     {
         //Debug.Log( " will pathfind " + ( _pathfinding == null ) );
         NavGridPathNode originNode = FindNearestNode( origin );
+        if ( originNode == null ) { return new NavGridPathNode[ 0 ]; }
         NavGridPathNode destinationNode = FindNearestNode( destination );
+        if ( destinationNode == null ) { return new NavGridPathNode[ 0 ]; }
         RecentPath = _pathfinding.FindPathASTAR( originNode, destinationNode );
 
         //Debug.LogError( "LineOfSight " + LineOfSight( originNode.x, originNode.z, destinationNode.x, destinationNode.z ) );
@@ -171,11 +211,11 @@ public class NavGrid : MonoBehaviour
         }
     }
 
+    // Calculate if there is line of sight between two nodes
     public bool LineOfSight ( NavGridPathNode a, NavGridPathNode b )
     {
         return LineOfSight( a.x, a.z, b.x, b.z );
     }
-
     public bool LineOfSight ( int a_x, int a_z, int b_x, int b_z )
     {
         int x0 = a_x;
@@ -186,7 +226,6 @@ public class NavGrid : MonoBehaviour
 
         int dx = x1 - x0;
         int dz = z1 - z0;
-
 
         int f = 0;
 
@@ -235,6 +274,7 @@ public class NavGrid : MonoBehaviour
         return true;
     }
 
+    // Return if a given node is traversable
     public bool isTraversable ( int x, int z )
     {
         if ( x < 0 || z < 0 ) { return false; }

@@ -5,7 +5,7 @@ public class Player : MonoBehaviour
 {
     private NavGridPathNode[] _currentPath = Array.Empty<NavGridPathNode>();
     private int _currentPathIndex = 0;
-    
+
     [SerializeField]
     private NavGrid _grid;
     [SerializeField]
@@ -17,28 +17,31 @@ public class Player : MonoBehaviour
     public GameObject Confetti;
     private GameObject ActiveConfetti;
 
-    void Update()
+    // Handle movement of roger
+    void Update ( )
     {
+
+        // If we are walking right now, swing arms
         if ( WALKING ) {
             DoSwingArms( );
         }
 
         // Check Input
-        if (Input.GetMouseButtonUp(0))
-        {
+        if ( Input.GetMouseButtonUp( 0 ) ) {
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out var hitInfo))
-            {
-                _currentPath = _grid.GetPath(transform.position, hitInfo.point);
-                _currentPathIndex = 0;
+            if ( Physics.Raycast( ray, out var hitInfo ) ) {
+                NavGridPathNode[] _newPath = _grid.GetPath( transform.position, hitInfo.point );
+                if ( _newPath.Length != 0 ) {
+                    _currentPath = _newPath;
+                    _currentPathIndex = 0;
+                }
             }
         }
 
-        // Traverse
-        if (_currentPathIndex < _currentPath.Length)
-        {
+        // If we have nodes to path, lets walk
+        if ( _currentPathIndex < _currentPath.Length ) {
             var currentNode = _currentPath[_currentPathIndex];
-            
+
             var maxDistance = _speed * Time.deltaTime;
             var vectorToDestination = currentNode._position - transform.position;
             var moveDistance = Mathf.Min(vectorToDestination.magnitude, maxDistance);
@@ -46,21 +49,26 @@ public class Player : MonoBehaviour
             var moveVector = vectorToDestination.normalized * moveDistance;
             moveVector.y = 0f; // Ignore Y
             transform.position += moveVector;
-            transform.forward = moveVector;
+            if ( moveVector != Vector3.zero ) {
+                transform.forward = moveVector;
+            }
 
-            if (transform.position == currentNode._position)
+            if ( transform.position == currentNode._position )
                 _currentPathIndex++;
 
             WALKING = true;
-        } else {
-            if ( WALKING ) {
-                if ( ActiveConfetti  != null ) { Destroy( ActiveConfetti ); }
+        } else { // we are done walking!
+            
+            if ( WALKING ) { // If we were walking previously
+                // Lets play somn celebratory confetti!
+                if ( ActiveConfetti != null ) { Destroy( ActiveConfetti ); }
                 ActiveConfetti = Instantiate( Confetti, transform.position, Quaternion.identity );
             }
             WALKING = false;
         }
     }
 
+    // Map arm swings to time
     private void DoSwingArms ( )
     {
         float sin = Mathf.Sin(Time.time * 10.0f);

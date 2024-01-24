@@ -6,9 +6,10 @@ public class Pathfinding
 {
     private List<NavGridPathNode> openList;
     private List<NavGridPathNode> closedList;
+
+    // Use ASTAR algorithm to find a short path from start to end
     public List<NavGridPathNode> FindPathASTAR ( NavGridPathNode start, NavGridPathNode end )
     {
-        //Debug.Log( " will pathfind2" );
         openList = new List<NavGridPathNode> { start };
         closedList = new List<NavGridPathNode>( );
 
@@ -17,22 +18,20 @@ public class Pathfinding
         start.hCost = NavGrid.m.CalculateDistanceCost( start.x, start.z, end.x, end.z );
         start.CalculateFCost( );
 
-        //Debug.Log( " will pathfind3" );
         while ( openList.Count > 0 ) {
-            //Debug.Log( " will pathfind + " + openList.Count );
             NavGridPathNode current = NavGrid.m.GetLowestFCostNode( openList );
-            //Debug.Log( " will pathfind + [" + current.x + "," + current.z + "]" );
 
+            // We found a path!
             if ( current == end ) {
                 //Debug.LogError( "REACHED THE END!" );
                 return SimpleSmooth( CalculatePath( end ) );
             }
 
-            // Not the end yet!
+            // Not the end point yet!
             openList.Remove( current );
             closedList.Add( current );
             List<NavGridPathNode> neighbors = NavGrid.m.GetNeighborList( current );
-            //Debug.Log( " found " + neighbors.Count + " neighbors" );
+            // Look at each neighbor
             foreach ( NavGridPathNode neighbor in neighbors ) {
                 // Is the neighbor already on the list?
                 if ( closedList.Contains( neighbor ) ) continue;
@@ -62,6 +61,7 @@ public class Pathfinding
         return null;
     }
 
+    // Reverse through the path and create the final calculated path
     public List<NavGridPathNode> CalculatePath ( NavGridPathNode end )
     {
         List <NavGridPathNode> calculatedPath = new List<NavGridPathNode>();
@@ -75,6 +75,7 @@ public class Pathfinding
         return calculatedPath;
     }
 
+    // Smooth the path using line of sight calculations
     public List<NavGridPathNode> SimpleSmooth ( List<NavGridPathNode> path )
     {
         int k = 0;
