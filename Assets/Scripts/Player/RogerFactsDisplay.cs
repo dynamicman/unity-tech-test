@@ -26,13 +26,14 @@ public class RogerFactsDisplay : MonoBehaviour
         RogerFacts.Add( "Roger has type O blood. That's quite nice." );
         RogerFacts.Add( "Roger's parents live just down the block. Maybe he should visit!" );
         RogerFacts.Add( "Roger saw a spider yesterday." );
-        RogerFacts.Add( "Roger is never sure of what hat he should wear." );
+        RogerFacts.Add( "Roger is never sure of what he should wear." );
         RogerFacts.Add( "Roger chews gum like it is going out of style!" );
+        
+        RogerFacts.Add( "Roger likes cheese a bit TOO much for most people." );
+        RogerFacts.Add( "Roger wants you to know he has over 200 types of cheese in his fridge." );
+        RogerFacts.Add( "Roger has never been to europe, and he really wants to. " );
+        RogerFacts.Add( "Roger once donated a dollar to a charity." );
         /*
-        RogerFacts.Add( "Roger " );
-        RogerFacts.Add( "Roger " );
-        RogerFacts.Add( "Roger " );
-        RogerFacts.Add( "Roger " );
         RogerFacts.Add( "Roger " );
         RogerFacts.Add( "Roger " );
         RogerFacts.Add( "Roger " );
