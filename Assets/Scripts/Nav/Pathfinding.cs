@@ -18,6 +18,7 @@ public class Pathfinding
         start.hCost = NavGrid.m.CalculateDistanceCost( start.x, start.z, end.x, end.z );
         start.CalculateFCost( );
 
+        // Keep going until the list of possible nodes is empty, or we reach the end node 
         while ( openList.Count > 0 ) {
             NavGridPathNode current = NavGrid.m.GetLowestFCostNode( openList );
 
@@ -40,6 +41,7 @@ public class Pathfinding
                     continue;
                 }
 
+                // Recalculate the costs for this node
                 int tentativeGCost = current.gCost +
                                      NavGrid.m.CalculateDistanceCost( current.x, current.z, neighbor.x, neighbor.z );
                 if ( tentativeGCost < neighbor.gCost ) {
